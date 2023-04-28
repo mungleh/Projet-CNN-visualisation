@@ -1,2 +1,0 @@
-streamlit_drawable_canvas
-cv2
