@@ -9,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 #model
-model = tf.keras.models.load_model('modail.h5')
+model = tf.keras.models.load_model('application/modail.h5')
 
 #config de la page
 st.set_page_config(
