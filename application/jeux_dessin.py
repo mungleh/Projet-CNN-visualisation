@@ -9,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 #model
-model = tf.keras.models.load_model('application/modail.h5')
+model = tf.keras.models.load_model('model.h5')
 
 #config de la page
 st.set_page_config(
@@ -44,8 +44,8 @@ col1, col2, col3 = st.columns(3, gap="large")
 with col1:
     st.write("Joue jusqua 10 itération pour entrainer ton model")
     #options du canva
-    stroke_width = st.slider("Taile du dessinage", 1, 25, 10)
-    realtime_update = st.checkbox("Actualisation en live", True)
+    #stroke_width = st.slider("Taile du dessinage", 1, 25, 10)
+    #realtime_update = st.checkbox("Actualisation en live", True)
     #bouton reset
     if st.button("Reset le jeux"):
         st.session_state.count = 0
@@ -55,10 +55,9 @@ with col2:
     #canvas
     st.write("1: Déssine puis dit a L'IA ta réponse")
     canvas_result = st_canvas(
-    stroke_width=stroke_width,
+    stroke_width=15,
     stroke_color='black',
-    background_color="white",
-    update_streamlit=realtime_update,
+    background_color="",
     height=300,
     width=300,
     drawing_mode='freedraw',
@@ -73,12 +72,17 @@ if canvas_result.image_data is not None:
     dessin = canvas_result.image_data
 
 #conversion
-dessin_pred = np.array(Image.fromarray(dessin).convert('L'))
-resized = cv2.resize(dessin_pred, (28,28)).astype('float32').reshape(1,28,28,1)/255
+data = Image.fromarray(dessin)
+im1 = data.resize((28,28))
+im1 = np.array(im1)
+selected_array = im1[:, :, 3]
+selected_array = (selected_array.reshape([-1,28,28,1]))/255
+#dessin_pred = np.array(Image.fromarray(dessin).convert('L'))
+#resized = cv2.resize(dessin_pred, (28,28)).astype('float32').reshape(1,28,28,1)/255
 
 #affichage resultats en table
 st.write('Probabilité du résultat en pourcentage')
-pred = model.predict(resized)
+pred = model.predict(selected_array)
 pred = (np.round(pred,3)*100).astype(int)
 
 #table
@@ -91,7 +95,7 @@ with col3:
     fig, ax = plt.subplots(figsize=(1,1))
     plt.tick_params(left = False, right = False , labelleft = False ,
             labelbottom = False, bottom = False)
-    ax.imshow(resized[0],cmap='gray')
+    ax.imshow(selected_array[0],cmap='gray')
     st.pyplot(fig=fig)
 
     #résultat
@@ -126,11 +130,11 @@ if st.button("Montrer les filtres"):
 
     # Let's run input image through our vislauization network
     # to obtain all intermediate representations for the image.
-    successive_feature_maps = visualization_model.predict(resized.reshape(1, 28, 28, 1))
+    successive_feature_maps = visualization_model.predict(selected_array.reshape(1, 28, 28, 1))
     # Retrieve are the names of the layers, so can have them as part of our plot
     layer_names = [layer.name for layer in model.layers]
     for layer_name, feature_map in zip(layer_names, successive_feature_maps):
-        print(feature_map.shape)
+        #print(feature_map.shape)
 
         if len(feature_map.shape) == 4:
 
@@ -157,6 +161,7 @@ if st.button("Montrer les filtres"):
             fig = plt.figure( figsize=(scale * n_features, scale) )
             plt.title ( layer_name )
             plt.grid  ( False )
-
+            plt.tick_params(left = False, right = False , labelleft = False ,
+                labelbottom = False, bottom = False)
             plt.imshow( display_grid, aspect='auto', cmap='viridis' )
             st.pyplot(fig)

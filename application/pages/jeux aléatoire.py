@@ -15,7 +15,7 @@ st.set_page_config(
 st.sidebar.success("Choisit ton jeux")
 
 #model
-model = tf.keras.models.load_model('application/modail.h5')
+model = tf.keras.models.load_model('model.h5')
 test = pd.read_csv("data/test.csv", delimiter=",", dtype='float32')
 
 test_samp = np.array(test.sample(1)/255)
