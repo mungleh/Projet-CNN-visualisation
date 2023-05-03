@@ -9,7 +9,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 #model
-model = tf.keras.models.load_model('modail.h5')
+model = tf.keras.models.load_model('application/modail.h5')
 
 #config de la page
 st.set_page_config(
@@ -28,13 +28,13 @@ if 'stat' not in st.session_state:
 
 #phrase pour afficher le % de précision du model
 def resultat():
-    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}% ptsm')
+    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 
 #quand le compteur atteint 10 itération, le jeux se reset
 if st.session_state.count >= 9:
     st.balloons()
-    st.write(f'Bravo ta un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}% nulos')
+    st.write(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
     if st.button("Recommencer le jeux ?"):
         st.session_state.count = 0
         st.session_state.stat = []
@@ -42,7 +42,7 @@ if st.session_state.count >= 9:
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.write("Joue jusqua 10 itération pour entrainer ton model oesh")
+    st.write("Joue jusqua 10 itération pour entrainer ton model")
     #options du canva
     stroke_width = st.slider("Taile du dessinage", 1, 25, 10)
     realtime_update = st.checkbox("Actualisation en live", True)
@@ -53,7 +53,7 @@ with col1:
 
 with col2:
     #canvas
-    st.write("1: Déssine puis dit a L'IA ta réponse la")
+    st.write("1: Déssine puis dit a L'IA ta réponse")
     canvas_result = st_canvas(
     stroke_width=stroke_width,
     stroke_color='black',
@@ -66,7 +66,7 @@ with col2:
     key="canvas"
     )
 
-    st.write("3: Clic sur la poubelle pour prédire un nouveau déssin oesh")
+    st.write("3: Clic sur la poubelle pour prédire un nouveau déssin")
 
 #stockage de l'image
 if canvas_result.image_data is not None:
@@ -87,7 +87,7 @@ st.table(data=pred)
 
 with col3:
     #affichage traitement
-    st.write("Ce que voit l'IA (ou moi sans lunette)")
+    st.write("Ce que voit l'IA")
     fig, ax = plt.subplots(figsize=(1,1))
     plt.tick_params(left = False, right = False , labelleft = False ,
             labelbottom = False, bottom = False)
@@ -119,3 +119,44 @@ with col3:
 
     if but1 or but0:
         resultat()
+
+if st.button("Montrer les filtres"):
+    successive_outputs = [layer.output for layer in model.layers[1:]]
+    visualization_model = tf.keras.models.Model(inputs = model.input, outputs = successive_outputs)
+
+    # Let's run input image through our vislauization network
+    # to obtain all intermediate representations for the image.
+    successive_feature_maps = visualization_model.predict(resized.reshape(1, 28, 28, 1))
+    # Retrieve are the names of the layers, so can have them as part of our plot
+    layer_names = [layer.name for layer in model.layers]
+    for layer_name, feature_map in zip(layer_names, successive_feature_maps):
+        print(feature_map.shape)
+
+        if len(feature_map.shape) == 4:
+
+            # Plot Feature maps for the conv / maxpool layers, not the fully-connected layers
+
+            n_features = feature_map.shape[-1]  # number of features in the feature map
+            size       = feature_map.shape[ 1]  # feature map shape (1, size, size, n_features)
+
+            # We will tile our images in this matrix
+            display_grid = np.zeros((size, size * n_features))
+
+            # Postprocess the feature to be visually palatable
+            for i in range(n_features):
+                x  = feature_map[0, :, :, i]
+                x -= x.mean()
+                x /= x.std()
+                x *=  64
+                x += 128
+                x  = np.clip(x, 0, 255).astype('uint8')
+                # Tile each filter into a horizontal grid
+                display_grid[:, i * size : (i + 1) * size] = x
+            # Display the grid
+                scale = 20. / n_features
+            fig = plt.figure( figsize=(scale * n_features, scale) )
+            plt.title ( layer_name )
+            plt.grid  ( False )
+
+            plt.imshow( display_grid, aspect='auto', cmap='viridis' )
+            st.pyplot(fig)
