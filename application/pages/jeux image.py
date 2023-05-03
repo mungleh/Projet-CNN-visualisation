@@ -28,13 +28,13 @@ if 'stat' not in st.session_state:
 
 #phrase pour afficher le % de précision du model
 def resultat():
-    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%, ptsm')
+    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 
 #quand le compteur atteint 10 itération, le jeux se reset
 if st.session_state.count >= 9:
     st.balloons()
-    st.write(f'Bravo ta un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}% nulos')
+    st.write(f'Bravo ta un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
     if st.button("Recommencer le jeux ?"):
         st.session_state.count = 0
         st.session_state.stat = []
@@ -42,7 +42,7 @@ if st.session_state.count >= 9:
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.write("1: Importe ton image starf sinan yaura l'erreur")
+    st.write("1: Importe ton image sinon yaura l'erreur")
     #importeur
     image_port = st.file_uploader("", type=["png", "jpg"])
     #bouton reset
@@ -57,7 +57,7 @@ with col2:
         hsize = 400
         image_ported = image_ported.resize((400,hsize), Image.Resampling.LANCZOS)
         st.image(image_ported)
-    st.write("3: Importe une autre image oesh")
+    st.write("3: Importe une autre image")
 
 
 #conversion
@@ -72,7 +72,7 @@ pred_table = st.table(data=y_pred_img)
 
 with col3:
     #affichage traitement
-    st.write("Ce que voit l'IA (ou moi sans lunette)")
+    st.write("Ce que voit l'IA")
     fig, ax = plt.subplots(figsize=(1,1))
     plt.tick_params(left = False, right = False , labelleft = False ,
             labelbottom = False, bottom = False)
@@ -106,102 +106,44 @@ with col3:
     if but1 or but0:
         resultat()
 
-# import pandas as pd
-# import numpy as np
-# from PIL import Image
-# import streamlit as st
-# from streamlit_drawable_canvas import st_canvas
-# import streamlit_nested_layout
-# import cv2
-# import tensorflow as tf
-# import matplotlib.pyplot as plt
+if st.button("Montrer les filtres"):
+    successive_outputs = [layer.output for layer in model.layers[1:]]
+    visualization_model = tf.keras.models.Model(inputs = model.input, outputs = successive_outputs)
 
-# #model
-# model = tf.keras.models.load_model('modail.h5')
+    # Let's run input image through our vislauization network
+    # to obtain all intermediate representations for the image.
+    successive_feature_maps = visualization_model.predict(resized_img.reshape(1, 28, 28, 1))
+    # Retrieve are the names of the layers, so can have them as part of our plot
+    layer_names = [layer.name for layer in model.layers]
+    for layer_name, feature_map in zip(layer_names, successive_feature_maps):
+        print(feature_map.shape)
 
-# st.set_page_config(
-#     layout="wide"
-# )
+        if len(feature_map.shape) == 4:
 
-# st.sidebar.success("Choisit ton jeux")
+            # Plot Feature maps for the conv / maxpool layers, not the fully-connected layers
 
-# #count de la session
-# if 'count' not in st.session_state:
-#     st.session_state.count = 0
+            n_features = feature_map.shape[-1]  # number of features in the feature map
+            size       = feature_map.shape[ 1]  # feature map shape (1, size, size, n_features)
 
-# #stat de la session
-# if 'stat' not in st.session_state:
-#     st.session_state.stat = []
+            # We will tile our images in this matrix
+            display_grid = np.zeros((size, size * n_features))
 
-# #phrase pour afficher le % de précision du model
-# def resultat():
-#     st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%, plus haut que ta beauté')
-
-
-# #quand le compteur atteint 10 itération, le jeux se reset
-# if st.session_state.count >= 9:
-#     st.balloons()
-#     st.write(f'Bravo ta un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}% nulos')
-#     if st.button("Recommencer le jeux ?"):
-#         st.session_state.count = 0
-#         st.session_state.stat = []
-
-# st.write("Importe ton image sinan sa yaura encore l'érreur")
-
-# col1, col2, col3 = st.columns(3, gap="large")
-
-# with col1:
-#     image_port = st.file_uploader("", type=["png", "jpg"])
-
-#     chiffre_pred = []
-
-#     if len(chiffre_pred) == 1:
-#         st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
-
-# with col2:
-#     if image_port:
-#         image_ported = Image.open(image_port)
-#         wpercent = (400/float(image_ported.size[0]))
-#         hsize = 400
-#         image_ported = image_ported.resize((400,hsize), Image.Resampling.LANCZOS)
-#         st.image(image_ported)
-
-# #bouton predict image
-# #if st.button('Prédit ton image'):
-# #st.balloons()
-
-# #conversion
-# image_pred = np.array(image_ported.convert('L'))
-# resized_img = cv2.resize(image_pred, (28,28)).astype('float32').reshape(1,28,28,1)/255
-
-# #affichage resultats en table
-# st.write('Probabilité du résultat en pourcentage')
-# y_pred_img = model.predict(resized_img)
-# y_pred_img = (np.round(y_pred_img,3)*100).astype(int)
-# pred_table = st.table(data=y_pred_img)
-# chiffre_pred = pd.DataFrame(y_pred_img).T.idxmax()
-
-# with col3:
-#     #affichage traitement
-#     st.write("Ce que voit l'IA")
-#     fig1, ax1 = plt.subplots()
-#     plt.tick_params(left = False, right = False , labelleft = False ,
-#             labelbottom = False, bottom = False)
-#     ax1.imshow(resized_img[0],cmap='gray')
-#     st.pyplot(fig=fig1)
-
-#     col11, col12 = st.columns(2,gap="large")
-
-#     with col11:
-#         #bouton juste
-#         but1 = st.button("Juste")
-#         if but1:
-#             st.session_state.count += 1
-#             st.session_state.stat.append(1)
-
-#     with col12:
-#         #bouton faux
-#         but0 = st.button("Faux")
-#         if but0:
-#             st.session_state.count += 1
-#             st.session_state.stat.append(0)
+            # Postprocess the feature to be visually palatable
+            for i in range(n_features):
+                x  = feature_map[0, :, :, i]
+                x -= x.mean()
+                x /= x.std()
+                x *=  64
+                x += 128
+                x  = np.clip(x, 0, 255).astype('uint8')
+                # Tile each filter into a horizontal grid
+                display_grid[:, i * size : (i + 1) * size] = x
+            # Display the grid
+                scale = 20. / n_features
+            fig = plt.figure( figsize=(scale * n_features, scale) )
+            plt.title ( layer_name )
+            plt.tick_params(left = False, right = False , labelleft = False ,
+                labelbottom = False, bottom = False)
+            plt.grid  ( False )
+            plt.imshow( display_grid, aspect='auto', cmap='viridis' )
+            st.pyplot(fig)
