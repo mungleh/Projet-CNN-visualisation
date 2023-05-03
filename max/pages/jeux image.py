@@ -28,7 +28,7 @@ if 'stat' not in st.session_state:
 
 #phrase pour afficher le % de précision du model
 def resultat():
-    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%, plus haut que ta beauté')
+    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%, ptsm')
 
 
 #quand le compteur atteint 10 itération, le jeux se reset
@@ -42,7 +42,7 @@ if st.session_state.count >= 9:
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.write("Joue jusqua 10 itération pour entrainer ton model oesh")
+    st.write("1: Importe ton image starf sinan yaura l'erreur")
     #importeur
     image_port = st.file_uploader("", type=["png", "jpg"])
     #bouton reset
@@ -57,6 +57,7 @@ with col2:
         hsize = 400
         image_ported = image_ported.resize((400,hsize), Image.Resampling.LANCZOS)
         st.image(image_ported)
+    st.write("3: Importe une autre image oesh")
 
 
 #conversion
@@ -67,7 +68,7 @@ resized_img = cv2.resize(image_pred, (28,28)).astype('float32').reshape(1,28,28,
 st.write('Probabilité du résultat en pourcentage')
 y_pred_img = model.predict(resized_img)
 y_pred_img = (np.round(y_pred_img,3)*100).astype(int)
-chiffre_pred = pd.DataFrame(y_pred_img).T.idxmax()
+pred_table = st.table(data=y_pred_img)
 
 with col3:
     #affichage traitement
@@ -79,14 +80,15 @@ with col3:
     st.pyplot(fig=fig)
 
     #résultat
-    chiffre_pred = pd.DataFrame(pred).T.idxmax()
+    chiffre_pred = pd.DataFrame(y_pred_img).T.idxmax()
     st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
+    st.write("2: Vrai au faux ?")
 
     col11, col12 = st.columns(2,gap="large")
 
     with col11:
         #bouton juste
-        but1 = st.button("Juste")
+        but1 = st.button("Vrai")
         if but1:
             st.session_state.count += 1
             st.session_state.stat.append(1)

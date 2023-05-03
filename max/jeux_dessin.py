@@ -16,6 +16,11 @@ st.set_page_config(
     layout="wide"
 )
 
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
+local_css("style.css")
+
 st.sidebar.success("Choisit ton jeux")
 
 #count de la session
@@ -28,7 +33,7 @@ if 'stat' not in st.session_state:
 
 #phrase pour afficher le % de précision du model
 def resultat():
-    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%, plus haut que ta beauté')
+    st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}% ptsm')
 
 
 #quand le compteur atteint 10 itération, le jeux se reset
@@ -53,7 +58,7 @@ with col1:
 
 with col2:
     #canvas
-    st.write("Déssine puis dit a L'IA ta réponse la")
+    st.write("1: Déssine puis dit a L'IA ta réponse la")
     canvas_result = st_canvas(
     stroke_width=stroke_width,
     stroke_color='black',
@@ -66,7 +71,7 @@ with col2:
     key="canvas"
     )
 
-    st.write("Clic sur la poubelle pour prédire un nouveau déssin oesh")
+    st.write("3: Clic sur la poubelle pour prédire un nouveau déssin oesh")
 
 #stockage de l'image
 if canvas_result.image_data is not None:
@@ -97,12 +102,12 @@ with col3:
     #résultat
     chiffre_pred = pd.DataFrame(pred).T.idxmax()
     st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
-
+    st.write("2: Vrai au faux ?")
     col11, col12 = st.columns(2,gap="large")
 
     with col11:
         #bouton juste
-        but1 = st.button("Juste")
+        but1 = st.button("Vrai")
         if but1:
             st.session_state.count += 1
             st.session_state.stat.append(1)
