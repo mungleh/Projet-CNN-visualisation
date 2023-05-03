@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.sidebar.success("Choisit ton type de prédiction")
+st.sidebar.success("Choisit ton jeux")
 
 #model
 model = tf.keras.models.load_model('modail.h5')
