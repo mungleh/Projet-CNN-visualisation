@@ -30,14 +30,12 @@ if 'stat' not in st.session_state:
 def resultat():
     st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
-
-#quand le compteur atteint 10 itération, le jeux se reset
+#afficher la fin
 if st.session_state.count >= 9:
     st.balloons()
-    st.write(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
-    if st.button("Recommencer le jeux ?"):
-        st.session_state.count = 0
-        st.session_state.stat = []
+    st.title(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
+    # st.session_state.count = 0
+    # st.session_state.stat = []
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -72,11 +70,8 @@ if canvas_result.image_data is not None:
     dessin = canvas_result.image_data
 
 #conversion
-data = Image.fromarray(dessin)
-im1 = data.resize((28,28))
-im1 = np.array(im1)
-selected_array = im1[:, :, 3]
-selected_array = (selected_array.reshape([-1,28,28,1]))/255
+data = np.array((Image.fromarray(dessin)).resize((28,28)))
+selected_array = ((data[:, :, 3]).reshape([-1,28,28,1]))/255
 #dessin_pred = np.array(Image.fromarray(dessin).convert('L'))
 #resized = cv2.resize(dessin_pred, (28,28)).astype('float32').reshape(1,28,28,1)/255
 
@@ -102,21 +97,30 @@ with col3:
     chiffre_pred = pd.DataFrame(pred).T.idxmax()
     st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
     st.write("2: Vrai au faux ?")
+
     col11, col12 = st.columns(2,gap="large")
 
     with col11:
         #bouton juste
         but1 = st.button("Vrai")
         if but1:
-            st.session_state.count += 1
-            st.session_state.stat.append(1)
+            if st.session_state.count >= 9:
+                st.session_state.count = 0
+                st.session_state.stat = []
+            else:
+                st.session_state.count += 1
+                st.session_state.stat.append(1)
 
     with col12:
         #bouton faux
         but0 = st.button("Faux")
         if but0:
-            st.session_state.count += 1
-            st.session_state.stat.append(0)
+            if st.session_state.count >= 9:
+                st.session_state.count = 0
+                st.session_state.stat = []
+            else:
+                st.session_state.count += 1
+                st.session_state.stat.append(0)
 
     #affichage du compte de la session et de la func de %
     st.write('Itération = ', st.session_state.count)
