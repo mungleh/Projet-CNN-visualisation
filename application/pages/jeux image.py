@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import streamlit_nested_layout
@@ -31,13 +31,10 @@ def resultat():
     st.write(f'Le modèle est précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 
-#quand le compteur atteint 10 itération, le jeux se reset
+#afficher la fin
 if st.session_state.count >= 9:
     st.balloons()
-    st.write(f'Bravo ta un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
-    if st.button("Recommencer le jeux ?"):
-        st.session_state.count = 0
-        st.session_state.stat = []
+    st.title(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -61,7 +58,7 @@ with col2:
 
 
 #conversion
-image_pred = np.array(image_ported.convert('L'))
+image_pred = np.array(ImageOps.invert(image_ported.convert("L")))
 resized_img = cv2.resize(image_pred, (28,28)).astype('float32').reshape(1,28,28,1)/255
 
 #affichage resultats en table
@@ -90,15 +87,23 @@ with col3:
         #bouton juste
         but1 = st.button("Vrai")
         if but1:
-            st.session_state.count += 1
-            st.session_state.stat.append(1)
+            if st.session_state.count >= 9:
+                st.session_state.count = 0
+                st.session_state.stat = []
+            else:
+                st.session_state.count += 1
+                st.session_state.stat.append(1)
 
     with col12:
         #bouton faux
         but0 = st.button("Faux")
         if but0:
-            st.session_state.count += 1
-            st.session_state.stat.append(0)
+            if st.session_state.count >= 9:
+                st.session_state.count = 0
+                st.session_state.stat = []
+            else:
+                st.session_state.count += 1
+                st.session_state.stat.append(0)
 
     #affichage du compte de la session et de la func de %
     st.write('Itération = ', st.session_state.count)

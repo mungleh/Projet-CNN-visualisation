@@ -34,26 +34,26 @@ with col1:
         ax.imshow(test_shaping.reshape(28, 28),cmap='gray_r')
         st.pyplot(fig=fig)
 
-        with col2:
+with col2:
 
-            #prédiction
-            pred = model.predict(test_shaping)
-            pred = (np.round(pred,3)*100).astype(int)
-            #résultat
-            chiffre_pred = pd.DataFrame(pred).T.idxmax()
-            st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
-            #table
-            st.table(data=pred)
+    #prédiction
+    pred = model.predict(test_shaping)
+    pred = (np.round(pred,3)*100).astype(int)
+    #résultat
+    chiffre_pred = pd.DataFrame(pred).T.idxmax()
+    st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
+    #table
+    tableh = st.table(data=pred)
 
-            st.write("La prédiction est juste ?")
+    st.write("La prédiction est juste ?")
 
-            col11, col12 = st.columns(2,gap="large")
+    col11, col12 = st.columns(2,gap="large")
 
-            with col11:
-                if st.button("Oui"):
-                    st.write('ok cool')
+    with col11:
+        if st.button("Oui"):
+            st.write('ok cool')
 
 
-            with col12:
-                if st.button("Non"):
-                    st.write('Euuh non')
+    with col12:
+        if st.button("Non"):
+            st.write('Euuh non')
