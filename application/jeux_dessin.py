@@ -34,8 +34,6 @@ def resultat():
 if st.session_state.count >= 9:
     st.balloons()
     st.title(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
-    # st.session_state.count = 0
-    # st.session_state.stat = []
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -82,7 +80,6 @@ pred = (np.round(pred,3)*100).astype(int)
 
 #table
 st.table(data=pred)
-
 
 with col3:
     #affichage traitement
