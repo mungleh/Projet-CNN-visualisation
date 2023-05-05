@@ -39,7 +39,7 @@ if st.session_state.count >= 9:
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.write("1: Importe ton image sinon pour enlever l'erreur")
+    st.write("1: Importe ton image pour enlever l'erreur")
     #importeur
     image_port = st.file_uploader("", type=["png", "jpg"])
     #bouton reset
