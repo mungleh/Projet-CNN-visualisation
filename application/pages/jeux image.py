@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.sidebar.success("Choisit ton jeux")
+st.sidebar.success("Choisis ton jeu")
 
 #count de la session
 if 'count' not in st.session_state:
@@ -34,7 +34,7 @@ def resultat():
 #afficher la fin
 if st.session_state.count >= 9:
     st.balloons()
-    st.title(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
+    st.title(f'Bravo tu as un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -43,7 +43,7 @@ with col1:
     #importeur
     image_port = st.file_uploader("", type=["png", "jpg"])
     #bouton reset
-    if st.button("Reset le jeux"):
+    if st.button("Reset le jeu"):
         st.session_state.count = 0
         st.session_state.stat = []
 
@@ -79,7 +79,7 @@ with col3:
     #résultat
     chiffre_pred = pd.DataFrame(y_pred_img).T.idxmax()
     st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
-    st.write("2: Vrai au faux ?")
+    st.write("2: Vrai ou faux ?")
 
     col11, col12 = st.columns(2,gap="large")
 

@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.sidebar.success("Choisit ton jeux")
+st.sidebar.success("Choisis ton jeu")
 
 #count de la session
 if 'count' not in st.session_state:
@@ -33,23 +33,23 @@ def resultat():
 #afficher la fin
 if st.session_state.count >= 9:
     st.balloons()
-    st.title(f'Bravo tu a un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
+    st.title(f'Bravo tu as un model entrainé, il était précis a {round(sum(st.session_state.stat)*100/len(st.session_state.stat))}%')
 
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
-    st.write("Joue jusqua 10 itération pour entrainer ton model")
+    st.write("Obtenir 10 iterations pour entrainer ton modèle")
     #options du canva
     #stroke_width = st.slider("Taile du dessinage", 1, 25, 10)
     #realtime_update = st.checkbox("Actualisation en live", True)
     #bouton reset
-    if st.button("Reset le jeux"):
+    if st.button("Reset le jeu"):
         st.session_state.count = 0
         st.session_state.stat = []
 
 with col2:
     #canvas
-    st.write("1: Déssine puis dit a L'IA ta réponse")
+    st.write("1: Dessine puis indique à l'IA ta réponse")
     canvas_result = st_canvas(
     stroke_width=15,
     stroke_color='black',
@@ -61,7 +61,7 @@ with col2:
     key="canvas"
     )
 
-    st.write("3: Clic sur la poubelle pour prédire un nouveau déssin")
+    st.write("3: Clic sur la poubelle pour prédire un nouveau dessin")
 
 #stockage de l'image
 if canvas_result.image_data is not None:
@@ -93,7 +93,7 @@ with col3:
     #résultat
     chiffre_pred = pd.DataFrame(pred).T.idxmax()
     st.write(f'Le chiffre est prédit est {chiffre_pred[0]}')
-    st.write("2: Vrai au faux ?")
+    st.write("2: Vrai ou faux ?")
 
     col11, col12 = st.columns(2,gap="large")
 
